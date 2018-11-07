@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Jerome Haltom</Authors>
+    <Company>Jerome Haltom</Company>
+    <Description>Service Fabric hosting support for FubarDev FTP Server.</Description>
+    <PackageProjectUrl>https://github.com/wasabii/FubarDev.FtpServer.ServiceFabric</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/wasabii/FubarDev.FtpServer.ServiceFabric.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FubarDev.FtpServer" Version="2.1.0" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.2.187" />
+  </ItemGroup>
+
+</Project>
