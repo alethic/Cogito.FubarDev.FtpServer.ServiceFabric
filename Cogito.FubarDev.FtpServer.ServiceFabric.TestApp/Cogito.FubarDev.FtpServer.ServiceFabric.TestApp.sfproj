@@ -32,7 +32,7 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FubarDev.FtpServer.ServiceFabric.TestApp.Service\FubarDev.FtpServer.ServiceFabric.TestApp.Service.csproj" />
+    <ProjectReference Include="..\FubarDev.FtpServer.ServiceFabric.TestApp.Service\Cogito.FubarDev.FtpServer.ServiceFabric.TestApp.Service.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
   <PropertyGroup>

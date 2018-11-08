@@ -4,9 +4,11 @@ using System.Fabric.Description;
 using System.Threading;
 using System.Threading.Tasks;
 
+using FubarDev.FtpServer;
+
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 
-namespace FubarDev.FtpServer.ServiceFabric
+namespace Cogito.FubarDev.FtpServer.ServiceFabric
 {
 
     public class FtpCommunicationListener : ICommunicationListener

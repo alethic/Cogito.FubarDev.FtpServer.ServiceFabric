@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="Cogito.FubarDev.FtpServer.ServiceFabric.TestApp" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+  <Parameters>
+    <Parameter Name="Cogito.FubarDev.FtpServer.ServiceFabric.TestApp.Service_InstanceCount" DefaultValue="-1" />
+  </Parameters>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="Cogito.FubarDev.FtpServer.ServiceFabric.TestApp.Service" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <DefaultServices>
+    <Service Name="Service" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="Cogito.FubarDev.FtpServer.ServiceFabric.TestApp.Service" InstanceCount="[Cogito.FubarDev.FtpServer.ServiceFabric.TestApp.Service_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+  </DefaultServices>
+</ApplicationManifest>
