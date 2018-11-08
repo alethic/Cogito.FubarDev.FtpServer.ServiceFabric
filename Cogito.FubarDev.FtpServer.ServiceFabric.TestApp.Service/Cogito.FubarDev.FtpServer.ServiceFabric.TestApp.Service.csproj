@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FubarDev.FtpServer.ServiceFabric\FubarDev.FtpServer.ServiceFabric.csproj" />
+      <ProjectReference Include="..\Cogito.FubarDev.FtpServer.ServiceFabric\Cogito.FubarDev.FtpServer.ServiceFabric.csproj" />
     </ItemGroup>
 
 </Project>

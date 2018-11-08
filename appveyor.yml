@@ -17,8 +17,8 @@ before_build:
 
 build:
   verbosity: minimal
-  project: FubarDev.FtpServer.ServiceFabric.sln
+  project: Cogito.FubarDev.FtpServer.ServiceFabric.sln
 
 artifacts:
   - path: pkg\*.nupkg
-    name: FubarDev.FtpServer.ServiceFabric
+    name: Cogito.FubarDev.FtpServer.ServiceFabric
