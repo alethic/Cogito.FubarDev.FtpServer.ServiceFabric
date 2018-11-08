@@ -6,7 +6,7 @@ namespace Cogito.FubarDev.FtpServer.ServiceFabric.TestApp.Service
 {
 
     public static class Program
-    {
+    { 
 
         public static void Main()
         {
