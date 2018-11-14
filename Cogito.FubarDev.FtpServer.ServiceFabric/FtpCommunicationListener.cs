@@ -110,10 +110,6 @@ namespace Cogito.FubarDev.FtpServer.ServiceFabric
                 try
                 {
                     await Task.Run(() => ftpServer.Stop());
-
-                    // wait for shutdown
-                    while (ftpServer.Ready)
-                        await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
                 }
                 catch (Exception)
                 {
