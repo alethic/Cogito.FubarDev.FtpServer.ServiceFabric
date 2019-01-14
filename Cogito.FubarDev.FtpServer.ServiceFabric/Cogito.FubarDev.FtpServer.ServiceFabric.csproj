@@ -7,8 +7,9 @@
     <Company>Jerome Haltom</Company>
     <Description>Service Fabric hosting support for FubarDev FTP Server.</Description>
     <PackageProjectUrl>https://github.com/wasabii/FubarDev.FtpServer.ServiceFabric</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/wasabii/FubarDev.FtpServer.ServiceFabric.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/wasabii/Cogito.FubarDev.FtpServer.ServiceFabric.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageIconUrl>https://cloverluxussc.blob.core.windows.net/public/cogito-nuget-icon.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>
