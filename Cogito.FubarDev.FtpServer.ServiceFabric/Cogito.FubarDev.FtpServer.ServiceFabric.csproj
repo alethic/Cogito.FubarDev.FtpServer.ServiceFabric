@@ -13,8 +13,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FubarDev.FtpServer" Version="2.1.1" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.3.624" />
+    <PackageReference Include="FubarDev.FtpServer" Version="2.2.0" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.3.638" />
   </ItemGroup>
 
 </Project>
