@@ -14,11 +14,11 @@ namespace Cogito.FubarDev.FtpServer.ServiceFabric
     public class FtpCommunicationListener : ICommunicationListener
     {
 
-        readonly ServiceContext serviceContext;
-        readonly string endpointName;
-        readonly Func<string, int, IFtpServer> build;
+        readonly ServiceContext _serviceContext;
+        readonly string _endpointName;
+        readonly Func<string, int, IFtpServer> _build;
 
-        IFtpServer ftpServer;
+        IFtpServer _ftpServer;
 
         /// <summary>
         /// Initializes a new instance.
@@ -31,9 +31,9 @@ namespace Cogito.FubarDev.FtpServer.ServiceFabric
             string endpointName,
             Func<string, int, IFtpServer> build)
         {
-            this.serviceContext = serviceContext ?? throw new ArgumentNullException(nameof(serviceContext));
-            this.endpointName = endpointName ?? throw new ArgumentNullException(nameof(endpointName));
-            this.build = build ?? throw new ArgumentNullException(nameof(build));
+            _serviceContext = serviceContext ?? throw new ArgumentNullException(nameof(serviceContext));
+            _endpointName = endpointName ?? throw new ArgumentNullException(nameof(endpointName));
+            _build = build ?? throw new ArgumentNullException(nameof(build));
         }
 
         /// <summary>
@@ -71,25 +71,25 @@ namespace Cogito.FubarDev.FtpServer.ServiceFabric
         /// <returns></returns>
         async Task<string> StartFtpServer(CancellationToken cancellationToken)
         {
-            var endpoint = serviceContext.CodePackageActivationContext.GetEndpoint(endpointName);
+            var endpoint = _serviceContext.CodePackageActivationContext.GetEndpoint(_endpointName);
             if (endpoint == null || endpoint.Protocol != EndpointProtocol.Tcp)
-                throw new InvalidOperationException($"Unable to find TCP endpoint named '{endpointName}'.");
+                throw new InvalidOperationException($"Unable to find TCP endpoint named '{_endpointName}'.");
 
-            ftpServer = build(serviceContext.NodeContext.IPAddressOrFQDN, endpoint.Port);
-            if (ftpServer == null)
+            _ftpServer = _build(_serviceContext.NodeContext.IPAddressOrFQDN, endpoint.Port);
+            if (_ftpServer == null)
                 throw new InvalidOperationException("Unable to build FtpServer instance.");
 
             try
             {
                 // queues the FTP server to start
-                ftpServer.Start();
+                _ftpServer.Start();
 
                 // ftp server starts in background, wait for completion
-                while (ftpServer.Ready == false && !cancellationToken.IsCancellationRequested)
+                while (_ftpServer.Ready == false && !cancellationToken.IsCancellationRequested)
                     await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
 
                 // yield out address server ended up listening on
-                return new Uri($"ftp://{ftpServer.ServerAddress}:{ftpServer.Port}/").ToString();
+                return new Uri($"ftp://{_ftpServer.ServerAddress}:{_ftpServer.Port}/").ToString();
             }
             catch (Exception)
             {
@@ -105,18 +105,18 @@ namespace Cogito.FubarDev.FtpServer.ServiceFabric
         /// <returns></returns>
         async Task StopFtpServer(CancellationToken cancellationToken)
         {
-            if (ftpServer != null)
+            if (_ftpServer != null)
             {
                 try
                 {
-                    await Task.Run(() => ftpServer.Stop());
+                    await Task.Run(() => _ftpServer.Stop());
                 }
                 catch (Exception)
                 {
                     try
                     {
-                        if (ftpServer != null)
-                            ftpServer.Stop();
+                        if (_ftpServer != null)
+                            _ftpServer.Stop();
                     }
                     catch (Exception)
                     {
@@ -125,7 +125,7 @@ namespace Cogito.FubarDev.FtpServer.ServiceFabric
                 }
                 finally
                 {
-                    ftpServer = null;
+                    _ftpServer = null;
                 }
             }
         }
