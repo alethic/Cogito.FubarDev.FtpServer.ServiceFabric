@@ -10,15 +10,12 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 
 namespace Cogito.FubarDev.FtpServer.ServiceFabric
 {
-
     public class FtpCommunicationListener : ICommunicationListener
     {
-
-        readonly ServiceContext _serviceContext;
-        readonly string _endpointName;
-        readonly Func<string, int, IFtpServer> _build;
-
-        IFtpServer _ftpServer;
+        private readonly ServiceContext _serviceContext;
+        private readonly string _endpointName;
+        private readonly Func<string, int, IFtpServer> _build;
+        private IFtpServer _ftpServer;
 
         /// <summary>
         /// Initializes a new instance.
@@ -45,9 +42,7 @@ namespace Cogito.FubarDev.FtpServer.ServiceFabric
             ServiceContext serviceContext,
             Func<string, int, IFtpServer> build) :
             this(serviceContext, "ServiceEndpoint", build)
-        {
-
-        }
+        { }
 
         public Task<string> OpenAsync(CancellationToken cancellationToken)
         {
@@ -73,23 +68,33 @@ namespace Cogito.FubarDev.FtpServer.ServiceFabric
         {
             var endpoint = _serviceContext.CodePackageActivationContext.GetEndpoint(_endpointName);
             if (endpoint == null || endpoint.Protocol != EndpointProtocol.Tcp)
+            {
                 throw new InvalidOperationException($"Unable to find TCP endpoint named '{_endpointName}'.");
+            }
 
-            _ftpServer = _build(_serviceContext.NodeContext.IPAddressOrFQDN, endpoint.Port);
+            var host = _serviceContext.NodeContext.IPAddressOrFQDN;
+            var port = endpoint.Port;
+
+            _ftpServer = _build(host, port);
+
             if (_ftpServer == null)
+            {
                 throw new InvalidOperationException("Unable to build FtpServer instance.");
+            }
 
             try
             {
                 // queues the FTP server to start
-                _ftpServer.Start();
+                await _ftpServer.StartAsync(cancellationToken);
 
                 // ftp server starts in background, wait for completion
-                while (_ftpServer.Ready == false && !cancellationToken.IsCancellationRequested)
+                while (!_ftpServer.Ready && !cancellationToken.IsCancellationRequested)
+                {
                     await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+                }
 
                 // yield out address server ended up listening on
-                return new Uri($"ftp://{_ftpServer.ServerAddress}:{_ftpServer.Port}/").ToString();
+                return new Uri($"ftp://{host}:{port}/").ToString();
             }
             catch (Exception)
             {
@@ -105,25 +110,13 @@ namespace Cogito.FubarDev.FtpServer.ServiceFabric
         /// <returns></returns>
         async Task StopFtpServer(CancellationToken cancellationToken)
         {
-            if (_ftpServer != null)
+            if (_ftpServer is IFtpServer)
             {
                 try
                 {
-                    await Task.Run(() => _ftpServer.Stop());
+                    await _ftpServer.StopAsync(cancellationToken);
                 }
                 catch (Exception)
-                {
-                    try
-                    {
-                        if (_ftpServer != null)
-                            _ftpServer.Stop();
-                    }
-                    catch (Exception)
-                    {
-                        // gave it our best go.
-                    }
-                }
-                finally
                 {
                     _ftpServer = null;
                 }
