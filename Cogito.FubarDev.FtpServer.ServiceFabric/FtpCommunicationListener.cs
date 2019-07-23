@@ -10,15 +10,12 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 
 namespace Cogito.FubarDev.FtpServer.ServiceFabric
 {
-
     public class FtpCommunicationListener : ICommunicationListener
     {
-
-        readonly ServiceContext serviceContext;
-        readonly string endpointName;
-        readonly Func<string, int, IFtpServer> build;
-
-        IFtpServer ftpServer;
+        private readonly ServiceContext _serviceContext;
+        private readonly string _endpointName;
+        private readonly Func<string, int, IFtpServer> _build;
+        private IFtpServer _ftpServer;
 
         /// <summary>
         /// Initializes a new instance.
@@ -31,9 +28,9 @@ namespace Cogito.FubarDev.FtpServer.ServiceFabric
             string endpointName,
             Func<string, int, IFtpServer> build)
         {
-            this.serviceContext = serviceContext ?? throw new ArgumentNullException(nameof(serviceContext));
-            this.endpointName = endpointName ?? throw new ArgumentNullException(nameof(endpointName));
-            this.build = build ?? throw new ArgumentNullException(nameof(build));
+            _serviceContext = serviceContext ?? throw new ArgumentNullException(nameof(serviceContext));
+            _endpointName = endpointName ?? throw new ArgumentNullException(nameof(endpointName));
+            _build = build ?? throw new ArgumentNullException(nameof(build));
         }
 
         /// <summary>
@@ -45,9 +42,7 @@ namespace Cogito.FubarDev.FtpServer.ServiceFabric
             ServiceContext serviceContext,
             Func<string, int, IFtpServer> build) :
             this(serviceContext, "ServiceEndpoint", build)
-        {
-
-        }
+        { }
 
         public Task<string> OpenAsync(CancellationToken cancellationToken)
         {
@@ -71,25 +66,35 @@ namespace Cogito.FubarDev.FtpServer.ServiceFabric
         /// <returns></returns>
         async Task<string> StartFtpServer(CancellationToken cancellationToken)
         {
-            var endpoint = serviceContext.CodePackageActivationContext.GetEndpoint(endpointName);
+            var endpoint = _serviceContext.CodePackageActivationContext.GetEndpoint(_endpointName);
             if (endpoint == null || endpoint.Protocol != EndpointProtocol.Tcp)
-                throw new InvalidOperationException($"Unable to find TCP endpoint named '{endpointName}'.");
+            {
+                throw new InvalidOperationException($"Unable to find TCP endpoint named '{_endpointName}'.");
+            }
 
-            ftpServer = build(serviceContext.NodeContext.IPAddressOrFQDN, endpoint.Port);
-            if (ftpServer == null)
+            var host = _serviceContext.NodeContext.IPAddressOrFQDN;
+            var port = endpoint.Port;
+
+            _ftpServer = _build(host, port);
+
+            if (_ftpServer == null)
+            {
                 throw new InvalidOperationException("Unable to build FtpServer instance.");
+            }
 
             try
             {
                 // queues the FTP server to start
-                ftpServer.Start();
+                await _ftpServer.StartAsync(cancellationToken);
 
                 // ftp server starts in background, wait for completion
-                while (ftpServer.Ready == false && !cancellationToken.IsCancellationRequested)
+                while (!_ftpServer.Ready && !cancellationToken.IsCancellationRequested)
+                {
                     await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+                }
 
                 // yield out address server ended up listening on
-                return new Uri($"ftp://{ftpServer.ServerAddress}:{ftpServer.Port}/").ToString();
+                return new Uri($"ftp://{host}:{port}/").ToString();
             }
             catch (Exception)
             {
@@ -105,27 +110,15 @@ namespace Cogito.FubarDev.FtpServer.ServiceFabric
         /// <returns></returns>
         async Task StopFtpServer(CancellationToken cancellationToken)
         {
-            if (ftpServer != null)
+            if (_ftpServer is IFtpServer)
             {
                 try
                 {
-                    await Task.Run(() => ftpServer.Stop());
+                    await _ftpServer.StopAsync(cancellationToken);
                 }
                 catch (Exception)
                 {
-                    try
-                    {
-                        if (ftpServer != null)
-                            ftpServer.Stop();
-                    }
-                    catch (Exception)
-                    {
-                        // gave it our best go.
-                    }
-                }
-                finally
-                {
-                    ftpServer = null;
+                    _ftpServer = null;
                 }
             }
         }
