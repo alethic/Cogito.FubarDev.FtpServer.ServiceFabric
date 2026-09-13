@@ -15,6 +15,7 @@
   <ItemGroup>
     <PackageReference Include="FubarDev.FtpServer" Version="2.2.0" />
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.3.638" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
 </Project>
